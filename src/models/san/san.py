@@ -1,3 +1,4 @@
+# Implementation of Side-Adapter Network from https://github.com/MendelXu/SAN
 from typing import List, Dict, Any
 
 
@@ -15,6 +16,7 @@ from .side_adapter import RegionwiseSideAdapterNetwork
 
 
 class SAN(nn.Module):
+
     def __init__(
         self,
         open_clip_cfg: Dict[str, str],

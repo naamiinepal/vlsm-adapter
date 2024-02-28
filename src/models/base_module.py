@@ -68,7 +68,7 @@ class BaseModule(LightningModule):
             batch.pop("mask_name"),
             batch.pop("height"),
             batch.pop("width"),
-            batch.pop("sentence")
+            batch.pop("sentence"),
         )
         dataset = None
         if "dataset" in batch:
@@ -126,15 +126,37 @@ class BaseModule(LightningModule):
 
     def training_step(self, batch: _mapping_str_any, batch_idx: int):
         step_out = self.step(batch)
-        loss, dice, iou = (
+        loss, images, dice, iou = (
             step_out["loss"],
+            step_out["images"],
             step_out["dice"],
             step_out["iou"],
         )
 
-        self.log("train/loss", loss, on_step=True, on_epoch=True, prog_bar=True)
-        self.log("train/dice", dice.mean(), on_step=True, on_epoch=True, prog_bar=True)
-        self.log("train/iou", iou.mean(), on_step=True, on_epoch=True, prog_bar=True)
+        self.log(
+            "train/loss",
+            loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
+        self.log(
+            "train/dice",
+            dice.mean(),
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
+        self.log(
+            "train/iou",
+            iou.mean(),
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
 
         # we can return here dict with any tensors
         # and then read it in some callback or in `training_epoch_end()` below
@@ -166,7 +188,7 @@ class BaseModule(LightningModule):
             batch_idx == 0
             and isinstance(self.logger, WandbLogger)
             and self.hparams.log_output_masks
-        )  :
+        ):
             # Only Log 16 images at max
             max_images_logs = 16
             if len(targets) < max_images_logs:
@@ -185,9 +207,30 @@ class BaseModule(LightningModule):
                 ],
             )
 
-        self.log("val/loss", loss, on_step=True, on_epoch=True, prog_bar=True)
-        self.log("val/dice", dice.mean(), on_step=True, on_epoch=True, prog_bar=True)
-        self.log("val/iou", iou.mean(), on_step=True, on_epoch=True, prog_bar=True)
+        self.log(
+            "val/loss",
+            loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
+        self.log(
+            "val/dice",
+            dice.mean(),
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
+        self.log(
+            "val/iou",
+            iou.mean(),
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
 
         return None
 
@@ -196,7 +239,7 @@ class BaseModule(LightningModule):
         # self.val_acc_best(acc)  # update best so far val acc
         # # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # # otherwise metric would be reset by lightning after each epoch
-        # self.log("val/acc_best", self.val_acc_best.compute(), prog_bar=True)
+        # self.log("val/acc_best", self.val_acc_best.compute(), prog_bar=True, batch_size=images.shape[0])
         pass
 
     def test_step(self, batch: _mapping_str_any, batch_idx: int):
@@ -235,10 +278,31 @@ class BaseModule(LightningModule):
                 ],
             )
 
-        self.log("test/loss", loss, on_step=True, on_epoch=True, prog_bar=True)
-        self.log("test/dice", dice.mean(), on_step=True, on_epoch=True, prog_bar=True)
+        self.log(
+            "test/loss",
+            loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
+        self.log(
+            "test/dice",
+            dice.mean(),
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
 
-        self.log("test/iou", iou.mean(), on_step=True, on_epoch=True, prog_bar=True)
+        self.log(
+            "test/iou",
+            iou.mean(),
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            batch_size=images.shape[0],
+        )
 
         return None
 

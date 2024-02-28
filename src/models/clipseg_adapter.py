@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from torch import nn
 from transformers import CLIPSegForImageSegmentation
@@ -10,12 +10,23 @@ from transformers.modeling_attn_mask_utils import (
 
 
 class Adapter(nn.Module):
+    r"""Adapter Module
 
-    def __init__(self, input_dim, adapter_dim, use_gelu=False):
+    A Module with the implementation of Adapter from http://proceedings.mlr.press/v97/houlsby19a.html.
+    Args:
+        input_dim (int): Dimension of input features.
+        adapter_dim (int): Intermediate dimension for adapter.
+        use_gelu (bool): Whether or not to GeLU activation; Default is False.
+    """
+
+    def __init__(
+        self, input_dim: int, adapter_dim: int, use_gelu=False
+    ) -> torch.Tensor:
+        super().__init__()
+
         self.input_dim = input_dim
         self.adapter_dim = adapter_dim
 
-        super().__init__()
         self.fc1 = torch.nn.Linear(self.input_dim, self.adapter_dim)
         self.fc2 = torch.nn.Linear(self.adapter_dim, self.input_dim)
         if use_gelu:
@@ -23,7 +34,12 @@ class Adapter(nn.Module):
         else:
             self.activation = torch.nn.ReLU()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            x: Pretrained Features
+        Returns: Adapted Features for the task
+        """
         h = self.activation(self.fc1(x))
         h = self.activation(self.fc2(h))
 
@@ -31,6 +47,18 @@ class Adapter(nn.Module):
 
 
 class CLIPSegAdapter(nn.Module):
+    r"""CLIPSeg Shallow Adapter Module
+    A Model with the implementation of CLIPSeg from HuggingFace.
+    Modified for the adapters implementation to the skip connections.
+
+    Args:
+        clipseg_hf_api (str): HuggingFace api to import the CLIPSeg implementation; Eg:'CIDAS/clipseg-rd64-refined'.
+        adapter_dim (int): Intermediate dimension for adapter.
+        freeze_clipseg (bool): Whether or not to freeze the pretrained model; Default is True.
+        adapter_in_v (bool): Whether or not to use adapters in vision encoder; Default is True.
+        adapter_in_l (bool): Whether or not to use adapters in langauge encoder; Default is True.
+        adapter_in_cond (bool): Whether or not to use adapters in conditional projection; Default is True.
+    """
 
     def __init__(
         self,
@@ -40,7 +68,7 @@ class CLIPSegAdapter(nn.Module):
         adapter_in_v: bool = True,
         adapter_in_l: bool = True,
         adapter_in_cond: bool = True,
-    ):
+    ) -> None:
         super().__init__()
 
         self.clipseg = CLIPSegForImageSegmentation.from_pretrained(clipseg_hf_api)
@@ -88,7 +116,16 @@ class CLIPSegAdapter(nn.Module):
         pixel_values: torch.Tensor,
         attention_mask: Optional[torch.Tensor] = None,
         **kwargs
-    ):
+    ) -> torch.Tensor:
+        """
+        Args:
+            pixel_values: Normalized image tensor.
+            input_ids: Tokenized text input.
+            attention_mask: Mask for token inputs, used in the attention layers.
+
+        Returns: Tensor with segmentation logits
+        """
+
         B, C, H, W = pixel_values.shape
         # step 1: forward the query images through the frozen CLIP vision encoder
         vision_outputs = self.clip.vision_model(
@@ -145,11 +182,10 @@ class CLIPSegAdapter(nn.Module):
                 # Apply the adapter on the hidden embeddings of texts as skip connections to the condtional embeddings
                 conditional_embeddings += adapter(h_state)
 
-        # step 4: forward both the hidden_activations and fused embedding through the lightweight decoder to predict masks
+        # step 3: forward both the hidden_activations and fused embedding through the lightweight decoder to predict masks
         decoder_outputs = self.clipseg.decoder(
             vision_activations,
             conditional_embeddings,
-            output_hidden_states=True,
         )
         logits = decoder_outputs.logits
 
@@ -157,6 +193,18 @@ class CLIPSegAdapter(nn.Module):
 
 
 class CLIPSegDenseAdapter(nn.Module):
+    r"""CLIPSeg Dense Adapter Module
+    A Model with the implementation of CLIPSeg from HuggingFace.
+    Modified for the adapters implementation to the attention layers of CLIPSeg
+
+    Args:
+        clipseg_hf_api (str): HuggingFace api to import the CLIPSeg implementation; Eg:'CIDAS/clipseg-rd64-refined'
+        adapter_dim (int): Intermediate dimension for adapter
+        freeze_clipseg (bool): Whether or not to freeze the pretrained model; Default is True.
+        adapter_in_v (bool): Whether or not to use adapters in vision encoder; Default is True.
+        adapter_in_l (bool): Whether or not to use adapters in langauge encoder; Default is True.
+        adapter_in_cond (bool): Whether or not to use adapters in conditional projection; Default is True.
+    """
 
     def __init__(
         self,
@@ -166,7 +214,7 @@ class CLIPSegDenseAdapter(nn.Module):
         adapter_in_v: bool = True,
         adapter_in_l: bool = True,
         adapter_in_cond: bool = True,
-    ):
+    ) -> None:
         super().__init__()
 
         self.clipseg = CLIPSegForImageSegmentation.from_pretrained(clipseg_hf_api)
@@ -179,11 +227,12 @@ class CLIPSegDenseAdapter(nn.Module):
 
         self.clipseg.requires_grad_(not freeze_clipseg)
 
-        # The trainable params
+        # The trainable params:
         if self.adapter_in_v:
             num_adapters = max(
                 self.clipseg_config.extract_layers
             )  # In this case 9 adapters
+
             self.v_attn_adapters = nn.ModuleList(
                 [
                     Adapter(
@@ -234,7 +283,7 @@ class CLIPSegDenseAdapter(nn.Module):
                 input_dim=self.clipseg_config.projection_dim, adapter_dim=256
             )
 
-    def vision_forward(self, pixel_values: torch.Tensor):
+    def vision_forward(self, pixel_values: torch.Tensor) -> List[torch.Tensor]:
 
         clip_vision_model = self.clipseg.clip.vision_model
         encoder_state = clip_vision_model.embeddings(pixel_values)
@@ -249,8 +298,9 @@ class CLIPSegDenseAdapter(nn.Module):
             encoder_state = encoder_layer.layer_norm1(encoder_state)
             encoder_state, _ = encoder_layer.self_attn(encoder_state)
 
-            # Apply adapter before residual
+            # Apply adapter before residual addition
             if self.adapter_in_v and idx < len(self.v_attn_adapters):
+                # Adapters are not applied beyond the hidden states that are not used by decoder
                 encoder_state = self.v_attn_adapters[idx](encoder_state)
 
             encoder_state = residual + encoder_state
@@ -259,8 +309,9 @@ class CLIPSegDenseAdapter(nn.Module):
             encoder_state = encoder_layer.layer_norm2(encoder_state)
             encoder_state = encoder_layer.mlp(encoder_state)
 
-            # Apply adapter before residual adding
+            # Apply adapter before residual addition
             if self.adapter_in_v and idx < len(self.v_out_adapters):
+                # Adapters are not applied beyond the hidden states that are not used by decoder
                 encoder_state = self.v_out_adapters[idx](encoder_state)
             encoder_state = residual + encoder_state
 
@@ -274,12 +325,11 @@ class CLIPSegDenseAdapter(nn.Module):
 
         return encoder_hidden_states
 
-
     def text_forward(
         self,
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
-    ):
+    ) -> torch.Tensor:
 
         input_shape = input_ids.size()
         input_ids = input_ids.view(-1, input_shape[-1])
@@ -341,8 +391,15 @@ class CLIPSegDenseAdapter(nn.Module):
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
         **kwargs
-    ):
+    ) -> torch.Tensor:
+        """
+        Args:
+            pixel_values: Normalized image tensor.
+            input_ids: Tokenized text input.
+            attention_mask: Mask for token inputs, used in the attention layers.
 
+        Returns: Tensor with segmentation logits.
+        """
         B, C, H, W = pixel_values.shape
 
         vision_hidden_states = self.vision_forward(pixel_values=pixel_values)
@@ -351,15 +408,15 @@ class CLIPSegDenseAdapter(nn.Module):
             vision_hidden_states[i + 1] for i in self.clipseg_config.extract_layers
         ]
 
-        conditional_embeddings = self.text_forward(input_ids=input_ids, attention_mask=attention_mask)
+        conditional_embeddings = self.text_forward(
+            input_ids=input_ids, attention_mask=attention_mask
+        )
 
         if self.adapter_in_cond:
             conditional_embeddings = self.cond_adapter(conditional_embeddings)
 
         decoder_outputs = self.clipseg.decoder(
-            vision_activations,
-            conditional_embeddings,
-            output_hidden_states=True,
+            vision_activations, conditional_embeddings
         )
         logits = decoder_outputs.logits
         return logits.view(B, 1, H, W)

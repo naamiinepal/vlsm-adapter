@@ -7,19 +7,29 @@ from typing import Literal
 accelerator = "gpu"
 devices = [0]
 precision = "16-mixed"
-debugger = False
-models = ["clipseg", "cris", "biomed_clipseg", "biomed_clipseg_d"]
+
+models = [
+    "cris",
+    "clipseg",
+    "san",
+    "clipseg_dense_adapter_vlc",
+    "clipseg_dense_adapter_vl",
+    "clipseg_dense_adapter_v",
+    "clipseg_shallow_adapter_vlc",
+    "clipseg_shallow_adapter_vl",
+    "clipseg_shallow_adapter_v",
+]
 
 models_configs = {
-    "clipseg": {"batch_size": 32, "lr": 0.001},
-    "clipseg_shallow_adapter_v": {"batch_size": 32, "lr": 0.001},
-    "clipseg_shallow_adapter_vl": {"batch_size": 32, "lr": 0.001},
-    "clipseg_shallow_adapter_vlc": {"batch_size": 32, "lr": 0.001},
-    "clipseg_dense_adapter_v": {"batch_size": 32, "lr": 0.001},
-    "clipseg_dense_adapter_vl": {"batch_size": 32, "lr": 0.001},
-    "clipseg_dense_adapter_vlc": {"batch_size": 32, "lr": 0.001},
-    "san": {"batch_size": 32, "lr": 0.0003},
     "cris": {"batch_size": 32, "lr": 0.001},
+    "clipseg": {"batch_size": 32, "lr": 0.001},
+    "san": {"batch_size": 32, "lr": 0.0003},
+    "clipseg_dense_adapter_vlc": {"batch_size": 32, "lr": 0.001},
+    "clipseg_dense_adapter_vl": {"batch_size": 32, "lr": 0.001},
+    "clipseg_dense_adapter_v": {"batch_size": 32, "lr": 0.001},
+    "clipseg_shallow_adapter_vlc": {"batch_size": 32, "lr": 0.0003},
+    "clipseg_shallow_adapter_vl": {"batch_size": 32, "lr": 0.0003},
+    "clipseg_shallow_adapter_v": {"batch_size": 32, "lr": 0.0003},
 }
 
 datasets = [
