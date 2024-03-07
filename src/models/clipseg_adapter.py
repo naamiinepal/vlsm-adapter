@@ -46,7 +46,7 @@ class Adapter(nn.Module):
         return x + h
 
 
-class CLIPSegAdapter(nn.Module):
+class CLIPSegShallowAdapter(nn.Module):
     r"""CLIPSeg Shallow Adapter Module
     A Model with the implementation of CLIPSeg from HuggingFace.
     Modified for the adapters implementation to the skip connections.

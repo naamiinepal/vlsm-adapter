@@ -1,4 +1,4 @@
-# Exploring Transfer Learning in Medical Image Segmentation using Vision-Language Models
+# VLSM-Adapter: Finetuning Vision-Language Segmentation Efficiently with Lightweight Blocks
 
 
 
@@ -7,7 +7,6 @@
 - [Usage](#usage)
   - [Pretrained Model Preparation](#pretrained-model-preparation) 
   - [Dataset Preparation](#dataset-preparation)
-  - [Zero Shot Segmentation](#zero-shot-segmentation)
   - [Finetuning](#finetuning)
 
 ## Installation
@@ -62,13 +61,6 @@ data/
 ```
 Each dataset folder (`bkai_polyp`, `busi`, `camus`, etc.) contains three sub-directories: `anns`, `images`, and `masks`. The anns directory contains prompt files (`test.json`, `train.json`, `val.json`), while `images` and `masks` hold input images and target masks respectively.
 
-### Zero Shot Segmentation
-
-To perform zero-shot segmentation, you can use the provided script. Open a terminal and navigate to the project directory, then execute the following command:
-```bash
-python scripts/zss.py
-```
-This script will initiate the zero-shot segmentation process and produce the desired results.
 
 ### Finetuning
 

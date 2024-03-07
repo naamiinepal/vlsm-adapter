@@ -1,6 +1,6 @@
 _target_: src.models.BaseModule
 net:
-  _target_: src.models.CLIPSegAdapter
+  _target_: src.models.CLIPSegShallowAdapter
   clipseg_hf_api: ${extras.clipseg_hf_api}
   adapter_dim: 512
   freeze_clipseg: true

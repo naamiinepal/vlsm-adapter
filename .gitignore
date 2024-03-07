@@ -172,3 +172,5 @@ evaluate
 pretrained/*
 !pretrained/.gitkeep
 
+# Temporary contents
+tmp/
