@@ -2,6 +2,8 @@
 
 ArXiv Link: [arxiv.org/abs/2405.06196](https://www.arxiv.org/abs/2405.06196)
 
+## Abstract
+Foundation Vision-Language Models (VLMs) trained using large-scale open-domain images and text pairs have recently been adapted to develop Vision-Language Segmentation Models (VLSMs) that allow providing text prompts during inference to guide image segmentation. If robust and powerful VLSMs can be built for medical images, it could aid medical professionals in many clinical tasks where they must spend substantial time delineating the target structure of interest. VLSMs for medical images resort to fine-tuning base VLM or VLSM pretrained on open-domain natural image datasets due to fewer annotated medical image datasets; this fine-tuning is resource-consuming and expensive as it usually requires updating all or a significant fraction of the pretrained parameters. Recently, lightweight blocks called adapters have been proposed in VLMs that keep the pretrained model frozen and only train adapters during fine-tuning, substantially reducing the computing resources required. We introduce a novel adapter, VLSM-Adapter, that can fine-tune pretrained vision-language segmentation models using transformer encoders. Our experiments in widely used CLIP-based segmentation models show that with only 3 million trainable parameters, the VLSM-Adapter outperforms state-of-the-art and is comparable to the upper bound end-to-end fine-tuning.
 
 ## Table of Contents
 - [Methodology](#methodology)
@@ -12,7 +14,6 @@ ArXiv Link: [arxiv.org/abs/2405.06196](https://www.arxiv.org/abs/2405.06196)
 ## Methodology
 <div style="text-align: center;">
   <img src="res/vlsm_adapter_arch.png" alt="VLSM-Adapter" style="width: 80%;"/>
-  <p>Architecture of VLSM-Adapter.</p>
 </div>
 
 ## Setup
@@ -33,7 +34,7 @@ For running inference, please update the defaults configs (such as `ckpt_path`, 
 ## Results
 <div style="text-align: center;">
   <img src="res/results.png" alt="VLSM-Adapter-Results" style="width: 80%;"/>
-  <p>Results of VLSM-Adapter.</p>
+</div>
 
 ### Acknowledgement
 We would like to thank [Lightning-Hydra-Template](https://github.com/ashleve/lightning-hydra-template) for providing a modifiable framework for running multiple experiments while tracking the hyperparameters.
