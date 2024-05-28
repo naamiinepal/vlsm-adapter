@@ -87,4 +87,5 @@ def run_exps():
                     print(f"!!! ERROR - COMMAND FAILED!!! \n{command}")
                     exit()
 
-run_exps()
+if __name__ == "__main__":
+    run_exps()
