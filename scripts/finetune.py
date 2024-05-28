@@ -63,7 +63,7 @@ def run_exps():
                 command = f"python src/train.py \
                     experiment={model}.yaml \
                     experiment_name={model}_{dataset}_seed_{seed} \
-                    datamodule=img_txt_mask/{dataset}.yaml \
+                    datamodule={dataset}.yaml \
                     datamodule.batch_size={batch_size} \
                     model.optimizer.lr={lr} \
                     trainer.accelerator={accelerator} \

@@ -1,1 +1,1 @@
-from .base_data_module import *
+from .base_data_module import BaseDataModule

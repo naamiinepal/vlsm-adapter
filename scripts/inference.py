@@ -52,7 +52,7 @@ def run_exps():
                     experiment={model}.yaml \
                     experiment_name={exp_name} \
                     ckpt_path=logs/train/runs/{exp_name}/checkpoints/best.ckpt \
-                    datamodule=img_txt_mask/{dataset}.yaml \
+                    datamodule={dataset}.yaml \
                     datamodule.batch_size={batch_size} \
                     trainer.accelerator={accelerator} \
                     trainer.precision={precision} \

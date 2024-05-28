@@ -7,11 +7,5 @@ enforce_tags: true
 # pretty print config tree at the start of the run using Rich library
 print_config: true
 
-# Huggingface API of Biomedclip for pretrained model and tokenizer
-biomedclip_hf_api: hf-hub:microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224
-
-# Huggingface API of PubMedBERT for pretrained model and tokenizer
-pubmedbert_hf_api: microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext
-
 # Huggingface API of CLIPSeg for pretrained model and tokenizer
 clipseg_hf_api: CIDAS/clipseg-rd64-refined

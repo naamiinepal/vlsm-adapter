@@ -13,7 +13,7 @@ Foundation Vision-Language Models (VLMs) trained using large-scale open-domain i
 
 ## Methodology
 <div style="text-align: center;">
-  <img src="res/vlsm_adapter_arch.png" alt="VLSM-Adapter" style="width: 80%;"/>
+  <img src="media/vlsm_adapter_arch.png" alt="VLSM-Adapter" style="width: 80%;"/>
 </div>
 
 ## Setup
@@ -33,7 +33,7 @@ For running inference, please update the defaults configs (such as `ckpt_path`, 
 
 ## Results
 <div style="text-align: center;">
-  <img src="res/results.png" alt="VLSM-Adapter-Results" style="width: 80%;"/>
+  <img src="media/results.png" alt="VLSM-Adapter-Results" style="width: 80%;"/>
 </div>
 
 ### Acknowledgement
