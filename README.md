@@ -1,5 +1,7 @@
 # VLSM-Adapter: Finetuning Vision-Language Segmentation Efficiently with Lightweight Blocks
 
+Accepted at: [MICCAI 2024](https://link.springer.com/chapter/10.1007/978-3-031-72114-4_68)
+
 ArXiv Link: [arxiv.org/abs/2405.06196](https://www.arxiv.org/abs/2405.06196)
 
 ## Abstract
