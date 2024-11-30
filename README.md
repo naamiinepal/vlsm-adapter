@@ -38,5 +38,19 @@ For running inference, please update the defaults configs (such as `ckpt_path`, 
   <img src="media/results.png" alt="VLSM-Adapter-Results" style="width: 80%;"/>
 </div>
 
+## BibTeX Citation
+```
+@inproceedings{dhakal2024vlsm,
+  title={VLSM-Adapter: Finetuning Vision-Language Segmentation Efficiently with Lightweight Blocks},
+  author={Dhakal, Manish and Adhikari, Rabin and Thapaliya, Safal and Khanal, Bishesh},
+  booktitle={International Conference on Medical Image Computing and Computer-Assisted Intervention},
+  pages={712--722},
+  year={2024},
+  organization={Springer}
+}
+
+
+```
+
 ### Acknowledgement
 We would like to thank [Lightning-Hydra-Template](https://github.com/ashleve/lightning-hydra-template) for providing a modifiable framework for running multiple experiments while tracking the hyperparameters.
